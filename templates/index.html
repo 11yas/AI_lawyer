@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ИИ-Юрист</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="chat-container">
+    <h1>⚖️ ИИ-Юрист</h1>
+    <div id="chat-box" class="chat-box">
+      <div class="bot">Добро пожаловать! Задайте юридический вопрос ниже.</div>
+    </div>
+    <div class="input-container">
+      <input id="question" type="text" placeholder="Введите вопрос..." />
+      <button id="send">➤</button>
+    </div>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById('send');
+    const questionInput = document.getElementById('question');
+    const chatBox = document.getElementById('chat-box');
+
+    async function sendMessage() {
+      const question = questionInput.value.trim();
+      if (!question) return;
+      chatBox.innerHTML += `<div class='user'>${question}</div>`;
+      questionInput.value = '';
+
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await response.json();
+      chatBox.innerHTML += `<div class='bot'>${data.answer}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    questionInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
